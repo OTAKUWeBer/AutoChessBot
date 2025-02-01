@@ -1,6 +1,5 @@
 import cv2
 import pyautogui
-import numpy as np
 import time
 from pynput import mouse
 from pathlib import Path
@@ -94,10 +93,15 @@ def process_chessboard(image):
         return board_positions
     return None
 
-def chess_notation_to_index(move, board_positions):
-    """Convert chess notation (e2e4) to board indices."""
-    col_map = {'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4, 'f': 5, 'g': 6, 'h': 7}
-    row_map = {'1': 7, '2': 6, '3': 5, '4': 4, '5': 3, '6': 2, '7': 1, '8': 0}
+def chess_notation_to_index(move, board_positions, color_indicator):
+    """Convert chess notation (e2e4) to board indices considering player color."""
+    # Column and row mappings based on player's color
+    if color_indicator == "w":
+        col_map = {'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4, 'f': 5, 'g': 6, 'h': 7}
+        row_map = {'1':7, '2':6, '3':5, '4':4, '5':3, '6':2, '7':1, '8':0}
+    else:  # Black player (flipped board)
+        col_map = {'a':7, 'b':6, 'c':5, 'd':4, 'e':3, 'f':2, 'g':1, 'h':0}
+        row_map = {'1':0, '2':1, '3':2, '4':3, '5':4, '6':5, '7':6, '8':7}
     
     try:
         start_col = col_map[move[0]]
@@ -109,10 +113,10 @@ def chess_notation_to_index(move, board_positions):
         print(f"Invalid move notation: {move}")
         return None, None
 
-def move_piece(move, board_positions):
-    """Simulate mouse movements to make the chess move."""
+def move_piece(move, board_positions, color_indicator):
+    """Simulate mouse movements to make the chess move considering player color."""
     global last_automated_click_time
-    start_pos, end_pos = chess_notation_to_index(move, board_positions)
+    start_pos, end_pos = chess_notation_to_index(move, board_positions, color_indicator)
     if not start_pos or not end_pos:
         return
 
@@ -122,7 +126,7 @@ def move_piece(move, board_positions):
     # Perform clicks and track automation time
     pyautogui.click(start_x, start_y)
     last_automated_click_time = time.time()
-    time.sleep(0.25)  # Reduced from 0.3 to avoid threshold overlap
+    time.sleep(0.25)
     pyautogui.click(end_x, end_y)
     last_automated_click_time = time.time()
     print(f"Executed move: {move}")
@@ -164,7 +168,7 @@ def on_click(x, y, button, pressed):
                 best_move = get_best_move(fen)
                 if best_move:
                     print(f"Recommended move: {best_move}")
-                    move_piece(best_move, board_positions)
+                    move_piece(best_move, board_positions, color_indicator)
                 else:
                     print("No valid move found!")
             
