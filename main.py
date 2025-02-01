@@ -6,9 +6,11 @@ from pynput.mouse import Listener
 from threading import Thread
 from getfen import get_fen_from_image
 
+
+# Screenshot path
 screenshot_path = Path("chess-screenshot.png")
 
-
+# Function to capture screen (ss)
 def capture_screenshot(path):
     """Capture a screenshot and save it to the specified path."""
     try:
@@ -26,6 +28,7 @@ def capture_screenshot(path):
         print(f"Screenshot failed: {e}")
 
 
+# Get the next best move
 def get_best_move(fen):
     """Run Stockfish to determine the best move from a given FEN."""
     try:
@@ -59,7 +62,7 @@ def get_best_move(fen):
         print(f"Stockfish error: {e}")
         return None
 
-
+# Double click sensor
 def on_click(x, y, button, pressed):
     """Detects double-click and captures the chessboard image."""
     if button.name == "left" and pressed:
@@ -93,7 +96,7 @@ def on_click(x, y, button, pressed):
 
         on_click.last_click_time = current_time
 
-
+# click reset
 on_click.last_click_time = 0
 
 # Ask for color only once
