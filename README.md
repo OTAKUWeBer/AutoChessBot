@@ -31,7 +31,7 @@ pip install -r requirements.txt
 To install Stockfish on Linux:
 ```bash
 sudo apt install stockfish  # Debian/Ubuntu
-sudo pacman -S stockfish   # Arch Linux
+paru/yay -S stockfish   # Arch Linux
 sudo dnf install stockfish  # Fedora
 ```
 
