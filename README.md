@@ -82,3 +82,5 @@ This project is licensed under the MIT License.
 ## Contributing
 Pull requests are welcome! Feel free to open an issue if you have any suggestions or improvements.
 
+## Acknowledgments
+* [Zai-Kun (For creating the wrapper around chessify.me)](https://github.com/Zai-Kun)
