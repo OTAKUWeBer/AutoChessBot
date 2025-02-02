@@ -18,6 +18,7 @@ Ensure you have the following installed:
 - `requests` (`pip install requests`)
 - `pynput` (`pip install pynput`)
 - `mss` (`pip install mss`)
+- `opencv` (`pip install opencv-python`)
 - Stockfish chess engine ([Download here](https://stockfishchess.org/))
 
 ## Installation
