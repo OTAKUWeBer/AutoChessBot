@@ -4,8 +4,20 @@ import time
 from pynput import mouse
 from pathlib import Path
 import subprocess
-import os
+import mss
+import mss.tools
+import platform
 from getfen import get_fen_from_image
+
+
+# Detect OS
+IS_WINDOWS = platform.system() == "Windows"
+
+# Set Stockfish executable path
+if IS_WINDOWS:
+    stockfish_path = "stockfish.exe"  # Change to your actual path
+else:
+    stockfish_path = "stockfish"  # Linux default
 
 # Global variables
 last_click_time = 0
@@ -16,16 +28,10 @@ color_indicator = "w"
 def capture_screenshot(path):
     """Capture a screenshot and save it to the specified path."""
     try:
-        if "WAYLAND_DISPLAY" in os.environ:
-            subprocess.run(["grim", str(path)], check=True)
-        else:
-            import mss
-            import mss.tools
-
-            with mss.mss() as sct:
-                monitor = sct.monitors[1]
-                sct_img = sct.grab(monitor)
-                mss.tools.to_png(sct_img.rgb, sct_img.size, output=str(path))
+        with mss.mss() as sct:
+            monitor = sct.monitors[1]
+            sct_img = sct.grab(monitor)
+            mss.tools.to_png(sct_img.rgb, sct_img.size, output=str(path))
         return True
     except Exception as e:
         print(f"Screenshot failed: {e}")
@@ -35,7 +41,7 @@ def get_best_move(fen):
     """Run Stockfish to determine the best move from a given FEN."""
     try:
         stockfish = subprocess.Popen(
-            ["stockfish"],
+            [stockfish_path],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
