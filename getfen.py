@@ -1,10 +1,8 @@
 import requests
 
-# Go to chessify.me, log in, and get the session_id from the cookies
 cookies = {
     "session_id": "romk2hiw1nxu19vns4s0v9ehiv8wctrl"
 }
-
 
 def get_token(cookies):
     """Fetch the user token using session cookies."""
@@ -15,7 +13,6 @@ def get_token(cookies):
     except requests.RequestException as e:
         print(f"Error fetching token: {e}")
         return None
-
 
 def get_fen(image_file, token):
     """Send an image file to Chessify to retrieve the FEN notation."""
@@ -41,9 +38,7 @@ def get_fen(image_file, token):
         print(f"Error fetching FEN: {e}")
         return None
 
-
 token = get_token(cookies)  # Fetch token once and reuse
-
 
 def flip_board(fen):
     """Flip the chessboard FEN notation for the opposite perspective."""
@@ -51,18 +46,63 @@ def flip_board(fen):
     flipped_rows = [row[::-1] for row in rows[::-1]]
     return "/".join(flipped_rows)
 
+def expand_fen_rank(rank):
+    """Expand a FEN rank string into individual squares."""
+    expanded = []
+    for c in rank:
+        if c.isdigit():
+            expanded.extend([' '] * int(c))
+        else:
+            expanded.append(c)
+    return expanded
+
+def get_castling_rights(position_part):
+    """Determine castling rights based on piece positions."""
+    castling = []
+    ranks = position_part.split('/')
+    
+    # Check white castling
+    if len(ranks) >= 8:
+        white_rank = expand_fen_rank(ranks[7])  # 1st rank (white's home)
+        if len(white_rank) >= 8:
+            if white_rank[4] == 'K':
+                if white_rank[7] == 'R':
+                    castling.append('K')
+                if white_rank[0] == 'R':
+                    castling.append('Q')
+    
+    # Check black castling
+    if len(ranks) >= 1:
+        black_rank = expand_fen_rank(ranks[0])  # 8th rank (black's home)
+        if len(black_rank) >= 8:
+            if black_rank[4] == 'k':
+                if black_rank[7] == 'r':
+                    castling.append('k')
+                if black_rank[0] == 'r':
+                    castling.append('q')
+    
+    return ''.join(castling) if castling else '-'
 
 def get_fen_from_image(image_path, color_indicator):
     """Read an image file and retrieve FEN from Chessify website."""
     try:
         with open(image_path, "rb") as image_file:
-            fen = get_fen(image_file, token)
-            if fen:
+            original_fen = get_fen(image_file, token)
+            if original_fen:
+                # Split into position part and other components
+                fen_parts = original_fen.split()
+                position_part = fen_parts[0] if fen_parts else original_fen
+                
+                # Flip the board if needed
                 if color_indicator == 'b':
-                    fen = flip_board(fen)
-
-                fen_with_color = f"{fen} {color_indicator}"
-                return fen_with_color
+                    position_part = flip_board(position_part)
+                
+                # Get castling rights from the (possibly flipped) position
+                castling_rights = get_castling_rights(position_part)
+                
+                # Construct full FEN with all required components
+                full_fen = f"{position_part} {color_indicator} {castling_rights} - 0 1"
+                return full_fen
             else:
                 print("Failed to retrieve FEN.")
                 return None
@@ -73,12 +113,12 @@ def get_fen_from_image(image_path, color_indicator):
         print(f"Unexpected error: {e}")
         return None
 
-
 if __name__ == "__main__":
-    image_path = input("Enter the path to the chessboard image: ").strip()
+    image_path = "chess-screenshot.png"
     color_indicator = input("Is it White or Black to move? (w/b): ").strip().lower()
     
     if color_indicator not in ['w', 'b']:
         print("Invalid input. Please enter 'w' for White or 'b' for Black.")
     else:
-        get_fen_from_image(image_path, color_indicator)
+        result = get_fen_from_image(image_path, color_indicator)
+        print("Generated FEN:", result)
