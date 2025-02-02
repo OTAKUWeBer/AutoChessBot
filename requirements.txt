@@ -2,3 +2,4 @@ requests
 pynput
 mss
 opencv-python
+pyautogui
