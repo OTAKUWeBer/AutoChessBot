@@ -50,7 +50,7 @@ Download `stockfish.exe` from [Stockfish](https://stockfishchess.org/download/) 
    - Enter `1` if playing as White  
    - Enter `2` if playing as Black  
 
-3. **Use 90% zoom for better accuracy.**  
+3. **Use 100% zoom for better accuracy.**  
 
 4. **Double-click on the chessboard or anywhere after opening Chess.com in your game for auto best move.**  
 
