@@ -22,6 +22,7 @@ class ChessAssistant:
         self.root.title("Chess Assistant")
         self.root.geometry("200x200")
         self.root.resizable(False, False)
+        self.root.attributes('-topmost', True)  # For window (to prevent minimization)
         self.color_indicator = None
         self.last_automated_click_time = 0
 
@@ -37,6 +38,18 @@ class ChessAssistant:
         self.create_color_selection()
         self.create_main_interface()
         self.show_color_selection()
+
+        # Bind Esc key to handle_esc_key method
+        self.root.bind('<Escape>', self.handle_esc_key)
+
+    def handle_esc_key(self, event=None):
+        """Switch back to color selection when Esc is pressed."""
+        if self.main_frame.winfo_ismapped():
+            self.main_frame.pack_forget()
+            self.color_frame.pack(expand=True, fill=tk.BOTH, pady=20)
+            self.color_indicator = None
+            self.btn_play.config(state=tk.DISABLED)
+            self.update_status("")
 
     def create_color_selection(self):
         self.color_frame = tk.Frame(self.root, bg=self.bg_color)
