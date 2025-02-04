@@ -16,7 +16,7 @@ Ensure you have the following installed:
 
 - Python 3.10+
 - `requests` (`pip install requests`)
-- `pynput` (`pip install pynput`)
+- `tkinter` (`pip install tkinter`)
 - `mss` (`pip install mss`)
 - `opencv` (`pip install opencv-python`)\
 - `pyautogui` (`pip install pyautogui`)
