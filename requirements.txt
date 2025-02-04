@@ -1,5 +1,4 @@
 requests
-tkinter
 mss
 opencv-python
 pyautogui

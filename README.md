@@ -1,25 +1,26 @@
 # Chess Position Evaluator
 
-This project captures a chessboard from a screenshot, extracts its FEN (Forsyth–Edwards Notation) representation, and uses Stockfish to suggest the best move. It also includes plans for a graphical user interface (GUI).
+This project captures a chessboard from a screenshot, extracts its FEN (Forsyth–Edwards Notation) representation, and uses Stockfish to suggest the best move. It now includes a graphical user interface (GUI) using Tkinter.
 
 ## Features
-✅ Captures the chessboard image using a double-click  
+✅ Captures the chessboard image using a single click  
 ✅ Extracts the FEN from the image via [Chessify](https://chessify.me)  
 ✅ Automatically flips the board if playing as Black  
 ✅ Uses Stockfish to suggest the best move  
 ✅ **Auto Move Execution**: Automatically makes the best move in the game  
-🛠 **Upcoming Features:**  
-  - **Graphical User Interface (GUI)**: A user-friendly interface instead of the terminal  
+✅ **Graphical User Interface (GUI)**: A user-friendly interface instead of the terminal  
+🛠 **New Features:**  
+  - **ESC to go back and choose color again**  
 
 ## Prerequisites
 Ensure you have the following installed:
 
 - Python 3.10+
 - `requests` (`pip install requests`)
-- `tkinter` (`pip install tkinter`)
 - `mss` (`pip install mss`)
-- `opencv` (`pip install opencv-python`)\
+- `opencv` (`pip install opencv-python`)
 - `pyautogui` (`pip install pyautogui`)
+- `tkinter` (Pre-installed with Python)
 - Stockfish chess engine ([Download here](https://stockfishchess.org/))
 
 ## Installation
@@ -46,24 +47,22 @@ Download `stockfish.exe` from [Stockfish](https://stockfishchess.org/download/) 
    python main.py
    ```  
 
-2. **Choose your color when prompted:**  
-   - Enter `1` if playing as White  
-   - Enter `2` if playing as Black  
+2. **Choose your color using the GUI:**  
+   - Click `White` if playing as White  
+   - Click `Black` if playing as Black  
+   - Press `ESC` to go back and choose the color again  
 
-3. **Use 100% zoom for better accuracy.**  
+3. **Use 100% zoom for better accuracy.**   
 
-4. **Double-click on the chessboard or anywhere after opening Chess.com in your game for auto best move.**  
-
-5. The script will:  
+4. The script will: (After you click "Play next move")
    - Extract the FEN  
    - Flip the board if necessary  
    - Get the best move from Stockfish  
    - Automatically execute the best move in your game  
 
-6. The best move will be displayed in the terminal.  
+5. The best move will be displayed only in the GUI.  
 
-### (Planned) Graphical User Interface
-A GUI will replace the terminal-based interaction, making the tool more user-friendly.
+6. **For better visibility, move the Tkinter application window to the side so the board is clearly visible.**  
 
 ## Configuration
 You need to provide a session ID for Chessify in `getfen.py`:
