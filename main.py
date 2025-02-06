@@ -20,7 +20,7 @@ class ChessAssistant:
     def __init__(self, root):
         self.root = root
         self.root.title("Chess Assistant")
-        self.root.geometry("200x200")
+        self.root.geometry("260x230")
         self.root.resizable(False, False)
         self.root.attributes('-topmost', True)  # For window (to prevent minimization)
         self.color_indicator = None
@@ -80,13 +80,17 @@ class ChessAssistant:
                                 fg=self.text_color,
                                 state=tk.DISABLED)
         self.status_label = tk.Label(self.main_frame,
-                                   text="",
-                                   bg=self.bg_color,
-                                   fg=self.text_color,
-                                   wraplength=230)
+                                    text="",
+                                    bg=self.bg_color,
+                                    fg=self.text_color,
+                                    wraplength=210,
+                                    anchor="center",
+                                    justify="center")
+
         
         self.btn_play.pack(pady=10)
         self.status_label.pack(pady=10, fill=tk.BOTH, expand=True)
+        self.main_frame.grid_propagate(False)
 
     def show_color_selection(self):
         self.color_frame.pack(expand=True, fill=tk.BOTH, pady=20)
@@ -218,33 +222,38 @@ class ChessAssistant:
 
     def process_move(self):
         self.update_status("Processing move...")
-        
+
         # Capture screenshot
         screenshot_path = Path("chess-screenshot.png")
         if screenshot_path.exists():
             screenshot_path.unlink()
-        
+
         if not self.capture_screenshot(screenshot_path):
-            self.update_status("Screenshot failed")
+            self.update_status("Screenshot failed!")
             return
 
         # Process chessboard
         image = cv2.imread(str(screenshot_path))
         board_positions = self.process_chessboard(image)
-        if not board_positions:
-            self.update_status("Chessboard not detected!")
-            return
 
         # Get FEN and best move
         fen = get_fen_from_image(str(screenshot_path), self.color_indicator)
+
         if not fen:
-            self.update_status("FEN extraction failed!")
+            if not board_positions:
+                self.update_status("Cannot find the Board.\nTry clearing the area around the chessboard.")
+            else:
+                self.update_status("FEN extraction failed!")
             return
 
         best_move = self.get_best_move(fen)
+        
         if best_move:
-            self.move_piece(best_move, board_positions)
-            self.update_status(f"Move Played: {best_move}")
+            if board_positions:
+                self.move_piece(best_move, board_positions)
+                self.update_status(f"Best Move: {best_move}\nMove Played: {best_move}")
+            else:
+                self.update_status(f"Best move: {best_move}\n\nBut I cannot move the piece due to a board detection error in my code.\nTry adjusting the zoom level to around 100% or experiment with different settings.")
         else:
             self.update_status("No valid move found!")
 
