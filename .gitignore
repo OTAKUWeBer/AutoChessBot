@@ -2,3 +2,4 @@ __pycache__
 chess-screenshot.png
 .python-version
 myenv
+dist
