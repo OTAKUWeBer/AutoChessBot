@@ -5,16 +5,37 @@ from pathlib import Path
 import subprocess
 import mss
 import mss.tools
-import platform
-from getfen import get_fen_from_image
+import sys
+import os
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import messagebox
+import threading
+import shutil
+from getfen import get_fen_from_image
 
-# Detect OS
-IS_WINDOWS = platform.system() == "Windows"
 
-# Set Stockfish executable path
-stockfish_path = "stockfish.exe" if IS_WINDOWS else "stockfish"
+def get_stockfish_path():
+    # If the app is bundled (e.g., with PyInstaller)
+    if getattr(sys, 'frozen', False):
+        path = os.path.join(sys._MEIPASS, "stockfish.exe" if os.name == "nt" else "stockfish")
+    else:
+        if os.name == "nt":
+            path = "stockfish.exe"
+        else:
+            # For Linux, try to find stockfish in the PATH
+            path = shutil.which("stockfish")
+            # If not found in PATH, fallback to a relative name
+            if path is None:
+                path = "stockfish"
+
+    # Verify that the path exists and is executable
+    if not (path and os.path.exists(path)):
+        messagebox.showerror("Error", "Stockfish is missing! Make sure it's bundled properly.")
+        sys.exit(1)
+
+    return path
+
+stockfish_path = get_stockfish_path()
 
 class ChessAssistant:
     def __init__(self, root):
@@ -75,7 +96,7 @@ class ChessAssistant:
         self.main_frame = tk.Frame(self.root, bg=self.bg_color)
         self.btn_play = tk.Button(self.main_frame,
                                 text="Play Next Move",
-                                command=self.process_move,
+                                command=self.process_move_thread,
                                 bg=self.accent_color,
                                 fg=self.text_color,
                                 state=tk.DISABLED)
@@ -221,42 +242,50 @@ class ChessAssistant:
         self.update_status(f"Executed move: {move}")
 
     def process_move(self):
-        self.update_status("Processing move...")
+        self.root.after(0, lambda: self.update_status("Processing move..."))
 
-        # Capture screenshot
-        screenshot_path = Path("chess-screenshot.png")
-        if screenshot_path.exists():
-            screenshot_path.unlink()
+        try:
+            # Capture screenshot
+            screenshot_path = Path("chess-screenshot.png")
+            if screenshot_path.exists():
+                screenshot_path.unlink()
 
-        if not self.capture_screenshot(screenshot_path):
-            self.update_status("Screenshot failed!")
-            return
+            if not self.capture_screenshot(screenshot_path):
+                self.root.after(0, lambda: self.update_status("Screenshot failed!"))
+                return
 
-        # Process chessboard
-        image = cv2.imread(str(screenshot_path))
-        board_positions = self.process_chessboard(image)
+            # Process chessboard
+            image = cv2.imread(str(screenshot_path))
+            board_positions = self.process_chessboard(image)
 
-        # Get FEN and best move
-        fen = get_fen_from_image(str(screenshot_path), self.color_indicator)
+            # Get FEN and best move
+            fen = get_fen_from_image(str(screenshot_path), self.color_indicator)
 
-        if not fen:
-            if not board_positions:
-                self.update_status("Cannot find the Board.\nTry clearing the area around the chessboard.")
+            if not fen:
+                msg = ("Cannot find the Board.\nTry clearing the area around the chessboard."
+                       if not board_positions else "FEN extraction failed!")
+                self.root.after(0, lambda: self.update_status(msg))
+                return
+
+            best_move = self.get_best_move(fen)
+
+            if best_move:
+                if board_positions:
+                    self.move_piece(best_move, board_positions)
+                    self.root.after(0, lambda: self.update_status(f"Best Move: {best_move}\nMove Played: {best_move}"))
+                else:
+                    self.root.after(0, lambda: self.update_status(f"Best move: {best_move}\n\n"
+                        "But I cannot move the piece due to a board detection error in my code.\n"
+                        "Try adjusting the zoom level to around 100% or experiment with different settings."))
             else:
-                self.update_status("FEN extraction failed!")
-            return
+                self.root.after(0, lambda: self.update_status("No valid move found!"))
 
-        best_move = self.get_best_move(fen)
-        
-        if best_move:
-            if board_positions:
-                self.move_piece(best_move, board_positions)
-                self.update_status(f"Best Move: {best_move}\nMove Played: {best_move}")
-            else:
-                self.update_status(f"Best move: {best_move}\n\nBut I cannot move the piece due to a board detection error in my code.\nTry adjusting the zoom level to around 100% or experiment with different settings.")
-        else:
-            self.update_status("No valid move found!")
+        except Exception as e:
+            self.root.after(0, lambda: messagebox.showerror("Error", f"An error occurred:\n{e}"))
 
+    def process_move_thread(self):
+        threading.Thread(target=self.process_move, daemon=True).start()
+    
 if __name__ == "__main__":
     root = tk.Tk()
     app = ChessAssistant(root)
