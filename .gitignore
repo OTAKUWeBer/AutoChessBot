@@ -1,5 +1,12 @@
-__pycache__
 chess-screenshot.png
+dist/
+build/
+*.spec
+__pycache__/
+*.pyc
+*.pyo
+myenv/
+myvenv/
 .python-version
-myenv
-dist
+stockfish
+stockfish.exe
