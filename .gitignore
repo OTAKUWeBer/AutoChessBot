@@ -6,7 +6,6 @@ __pycache__/
 *.pyc
 *.pyo
 myenv/
-myvenv/
 .python-version
 stockfish
 stockfish.exe
