@@ -143,12 +143,16 @@ class ChessAssistant:
 
     def get_best_move(self, fen):
         try:
+            flags = 0
+            if os.name == "nt":
+                flags = subprocess.CREATE_NO_WINDOW
             stockfish = subprocess.Popen(
                 [stockfish_path],
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
+                creationflags=flags
             )
 
             stockfish.stdin.write(f"position fen {fen}\n")
