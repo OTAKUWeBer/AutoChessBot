@@ -1,7 +1,7 @@
 import requests
 
 cookies = {
-    "session_id": "romk2hiw1nxu19vns4s0v9ehiv8wctrl"
+    "session_id": "b075pmwiukzf7vj72h0vswod5lkbfkac"
 }
 
 def get_token(cookies):
