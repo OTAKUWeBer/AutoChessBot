@@ -1,4 +1,4 @@
-chess-screenshot.png
+*.png
 dist/
 build/
 *.spec
