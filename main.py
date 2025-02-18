@@ -158,7 +158,7 @@ class ChessAssistant:
             stockfish.stdin.write(f"position fen {fen}\n")
             stockfish.stdin.write("go depth 15\n")
             stockfish.stdin.flush()
-
+            
             output = ""
             while True:
                 line = stockfish.stdout.readline()
