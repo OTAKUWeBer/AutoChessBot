@@ -12,6 +12,11 @@ This project captures a chessboard from a screenshot, extracts its FEN (Forsyth�
 🛠 **New Features:**  
   - **ESC to go back and choose color again**  
 
+## ⚠️ Known Issue
+- When the board state is unclear or half of the pieces have crossed the midline, Chessify may provide an inaccurate FEN. This can lead to incorrect move suggestions or unexpected behavior.  
+- This issue is due to the limitations of the image recognition model used by Chessify.  
+- ⚠️ **I plan to address this in a future update.**  
+
 ## Prerequisites
 Ensure you have the following installed:
 
